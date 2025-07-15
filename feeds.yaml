@@ -1,0 +1,4 @@
+feeds:
+  - https://hnrss.org/frontpage
+  - https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml
+  - https://www.reddit.com/r/Python/.rss
