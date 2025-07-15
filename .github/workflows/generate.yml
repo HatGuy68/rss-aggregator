@@ -1,0 +1,40 @@
+name: Generate RSS Feed
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # Runs daily at 3 AM UTC
+  workflow_dispatch:       # Allows manual trigger from GitHub UI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install Dependencies
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: Generate RSS Feed
+        run: |
+          source .venv/bin/activate
+          python generate_feed.py
+
+      - name: Commit and Push changes
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add public/rss.xml
+          git commit -m "🤖 Update RSS feed [auto]" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
