@@ -53,9 +53,9 @@ def main():
         fe.description(entry.get("summary", ""))
         fe.pubDate(entry["parsed_date"])
 
-    os.makedirs("public", exist_ok=True)
-    fg.rss_file("public/rss.xml")
-    print("✅ RSS feed saved to public/rss.xml")
+    os.makedirs("docs", exist_ok=True)
+    fg.rss_file("docs/rss.xml")
+    print("✅ RSS feed saved to docs/rss.xml")
 
 if __name__ == "__main__":
     main()
