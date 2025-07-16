@@ -1,7 +1,7 @@
 import feedparser
 import yaml
 from feedgen.feed import FeedGenerator
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil import parser as date_parser
 import os
 
@@ -36,11 +36,23 @@ def main():
                 break
 
             pub_date = entry.get("published") or entry.get("updated")
-            if isinstance(pub_date, list):
-                pub_date = pub_date[0] if pub_date else None
-            if not isinstance(pub_date, str):
-                pub_date = str(pub_date) if pub_date is not None else None
-            entry["parsed_date"] = date_parser.parse(pub_date) if pub_date else datetime.utcnow()
+            try:
+                if isinstance(pub_date, list):
+                    pub_date = pub_date[0] if pub_date else None
+                if not isinstance(pub_date, str):
+                    pub_date = str(pub_date) if pub_date is not None else None
+                if pub_date:
+                    parsed_date = date_parser.parse(pub_date)
+                    if parsed_date.tzinfo is None:
+                        parsed_date = parsed_date.replace(tzinfo=timezone.utc)
+                    else:
+                        parsed_date = parsed_date.astimezone(timezone.utc)
+                else:
+                    raise ValueError("No valid pub_date")
+            except Exception:
+                parsed_date = datetime.now(timezone.utc)
+
+            entry["parsed_date"] = parsed_date
             entries.append(entry)
             count += 1
 
